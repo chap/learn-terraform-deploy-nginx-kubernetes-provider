@@ -13,7 +13,7 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "vpc" {
+data "terraform_remote_state" "eks" {
   backend = "remote"
   config = {
     organization = "example-org-d1657"
