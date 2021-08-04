@@ -57,7 +57,7 @@ resource "kubernetes_deployment" "nginx" {
   }
 
   spec {
-    replicas = 4
+    replicas = 0
     selector {
       match_labels = {
         App = "ScalableNginxExample"
