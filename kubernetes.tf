@@ -14,6 +14,13 @@ terraform {
 
 data "terraform_remote_state" "eks" {
   backend = "remote"
+  
+    config = {
+    organization = "example-org-d1657"
+    workspaces = {
+      name = "nginx-kubernetes"
+    }
+  }  
 }
 
 # Retrieve EKS cluster information
