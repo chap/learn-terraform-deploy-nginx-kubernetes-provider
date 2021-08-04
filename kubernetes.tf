@@ -16,7 +16,7 @@ terraform {
 data "terraform_remote_state" "eks" {
   backend = "remote"
   config = {
-    organization = "example-org-d1657"
+    organization = "example-org-d16576"
     workspaces = {
       name = "eks-cluster"
     }
