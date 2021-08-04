@@ -13,15 +13,14 @@ terraform {
   }
 }
 
-data "terraform_remote_state" "eks" {
+data "terraform_remote_state" "vpc" {
   backend = "remote"
-  
-    config = {
+  config = {
     organization = "example-org-d1657"
     workspaces = {
       name = "eks-cluster"
     }
-  }  
+  }
 }
 
 # Retrieve EKS cluster information
