@@ -18,7 +18,7 @@ data "terraform_remote_state" "eks" {
     config = {
     organization = "example-org-d1657"
     workspaces = {
-      name = "nginx-kubernetes"
+      name = "eks-cluster"
     }
   }  
 }
