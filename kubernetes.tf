@@ -113,7 +113,6 @@ resource "kubernetes_service" "nginx" {
       target_port = 3000
     }
 
-    type = "LoadBalancer"
   }
 }
 
@@ -150,4 +149,97 @@ resource "kubernetes_cron_job" "demo" {
       }
     }
   }
+}
+
+resource "kubernetes_ingress" "main" {
+  metadata {
+    name = "main-ingress"
+    annotations = {
+      "alb.ingress.kubernetes.io/scheme" = "internet-facing"
+      "kubernetes.io/ingress.class" = "alb"
+      "alb.ingress.kubernetes.io/certificate-arn" = "${aws_acm_certificate.cert.arn}"
+      "alb.ingress.kubernetes.io/listen-ports" = <<JSON
+[
+  {"HTTP": 80},
+  {"HTTPS": 443}
+]
+JSON
+      "alb.ingress.kubernetes.io/actions.ssl-redirect" = <<JSON
+{
+  "Type": "redirect",
+  "RedirectConfig": {
+    "Protocol": "HTTPS",
+    "Port": "443",
+    "StatusCode": "HTTP_301"
+  }
+}
+JSON
+    }
+  }
+
+  spec {
+    rule {
+      host = "53.chapambrose.com"
+      http {
+        path {
+          backend {
+            service_name = "ssl-redirect"
+            service_port = "use-annotation"
+          }
+          path = "/*"
+        }
+        path {
+          backend {
+            service_name = "nginx"
+            service_port = 80
+          }
+          path = "/*"
+        }
+      }
+    }
+
+
+  }
+}
+
+resource "aws_acm_certificate" "cert" {
+  domain_name               = "53.chapambrose.com"
+  validation_method         = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cert_validation-0" {
+  name     = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
+  type     = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
+  zone_id  = var.hosted-zone
+  records  = [aws_acm_certificate.cert.domain_validation_options.0.resource_record_value]
+  ttl      = 60
+}
+
+resource "aws_route53_record" "cert_validation-1" {
+  name     = aws_acm_certificate.cert.domain_validation_options.1.resource_record_name
+  type     = aws_acm_certificate.cert.domain_validation_options.1.resource_record_type
+  zone_id  = var.hosted-zone
+  records  = [aws_acm_certificate.cert.domain_validation_options.1.resource_record_value]
+  ttl      = 60
+}
+
+resource "aws_route53_record" "cert_validation-2" {
+  name     = aws_acm_certificate.cert.domain_validation_options.2.resource_record_name
+  type     = aws_acm_certificate.cert.domain_validation_options.2.resource_record_type
+  zone_id  = var.hosted-zone
+  records  = [aws_acm_certificate.cert.domain_validation_options.2.resource_record_value]
+  ttl      = 60
+}
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn         = aws_acm_certificate.cert.arn
+  validation_record_fqdns = [
+    aws_route53_record.cert_validation-0.fqdn,
+    aws_route53_record.cert_validation-1.fqdn,
+    aws_route53_record.cert_validation-2.fqdn
+  ]
 }
