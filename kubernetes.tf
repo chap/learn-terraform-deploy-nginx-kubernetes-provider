@@ -227,19 +227,10 @@ resource "aws_route53_record" "cert_validation-1" {
   ttl      = 60
 }
 
-resource "aws_route53_record" "cert_validation-2" {
-  name     = aws_acm_certificate.cert.domain_validation_options.2.resource_record_name
-  type     = aws_acm_certificate.cert.domain_validation_options.2.resource_record_type
-  zone_id  = var.hosted-zone
-  records  = [aws_acm_certificate.cert.domain_validation_options.2.resource_record_value]
-  ttl      = 60
-}
-
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [
     aws_route53_record.cert_validation-0.fqdn,
     aws_route53_record.cert_validation-1.fqdn,
-    aws_route53_record.cert_validation-2.fqdn
   ]
 }
