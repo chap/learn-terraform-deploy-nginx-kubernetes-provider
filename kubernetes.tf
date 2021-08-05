@@ -157,6 +157,7 @@ resource "kubernetes_ingress" "main" {
     annotations = {
       "alb.ingress.kubernetes.io/scheme" = "internet-facing"
       "kubernetes.io/ingress.class" = "alb"
+      "kubernetes.io/role/elb" = "1"
       "alb.ingress.kubernetes.io/certificate-arn" = "${aws_acm_certificate.cert.arn}"
       "alb.ingress.kubernetes.io/listen-ports" = <<JSON
 [
@@ -210,6 +211,11 @@ resource "aws_acm_certificate" "cert" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+data "aws_route53_zone" "example" {
+  name         = "53.chapambrose.com"
+  private_zone = false
 }
 
 
