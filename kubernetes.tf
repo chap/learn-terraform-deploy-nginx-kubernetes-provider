@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "nginx" {
       }
       spec {
         container {
-          image = "199388573085.dkr.ecr.us-east-2.amazonaws.com/video-streaming"
+          image = "199388573085.dkr.ecr.us-east-2.amazonaws.com/video-streaming:latest"
           name  = "example"
 
           port {
