@@ -157,6 +157,7 @@ resource "kubernetes_ingress" "main" {
     annotations = {
       "alb.ingress.kubernetes.io/scheme" = "internet-facing"
       "kubernetes.io/ingress.class" = "alb"
+      "external-dns.alpha.kubernetes.io/hostname" = "53.chapambrose.com"
       "alb.ingress.kubernetes.io/certificate-arn" = "${aws_acm_certificate.cert.arn}"
       "alb.ingress.kubernetes.io/listen-ports" = <<JSON
 [
@@ -186,12 +187,12 @@ JSON
             service_name = "ssl-redirect"
             service_port = "use-annotation"
           }
-          path = "/*"
+          path = "/redirect"
         }
         path {
           backend {
             service_name = "nginx"
-            service_port = 80
+            service_port = 3000
           }
           path = "/*"
         }
